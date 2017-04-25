@@ -1,4 +1,7 @@
-# api documentation for  [aws-sdk-mock (v1.6.1)](https://github.com/dwyl/aws-sdk-mock#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-aws-sdk-mock.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-aws-sdk-mock) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-aws-sdk-mock.svg)](https://travis-ci.org/npmdoc/node-npmdoc-aws-sdk-mock)
+# npmdoc-aws-sdk-mock
+
+#### basic api documentation for  [aws-sdk-mock (v1.7.0)](https://github.com/dwyl/aws-sdk-mock#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-aws-sdk-mock.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-aws-sdk-mock) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-aws-sdk-mock.svg)](https://travis-ci.org/npmdoc/node-npmdoc-aws-sdk-mock)
+
 #### Functions to mock the JavaScript aws-sdk
 
 [![NPM](https://nodei.co/npm/aws-sdk-mock.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/aws-sdk-mock)
@@ -38,10 +41,10 @@
     },
     "directories": {},
     "dist": {
-        "shasum": "79dce665a8295f76fde7afa7b4a6ca03e1afaa62",
-        "tarball": "https://registry.npmjs.org/aws-sdk-mock/-/aws-sdk-mock-1.6.1.tgz"
+        "shasum": "7698b3ba82f493f71ff060ae2123cd0806ad8676",
+        "tarball": "https://registry.npmjs.org/aws-sdk-mock/-/aws-sdk-mock-1.7.0.tgz"
     },
-    "gitHead": "a9816997e94536f45eea81846282fcee43b75db7",
+    "gitHead": "b2863e782b3a8ce791209f51caa2a8250536b61b",
     "homepage": "https://github.com/dwyl/aws-sdk-mock#readme",
     "keywords": [
         "aws-sdk",
@@ -80,7 +83,8 @@
         "nocov": "tape test/*.js",
         "test": "istanbul cover ./node_modules/tape/bin/tape ./test/*.js"
     },
-    "version": "1.6.1"
+    "version": "1.7.0",
+    "bin": {}
 }
 ```
 
