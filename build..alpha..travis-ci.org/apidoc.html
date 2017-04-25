@@ -51,7 +51,7 @@
 
         href="https://github.com/dwyl/aws-sdk-mock#readme"
 
-    >aws-sdk-mock (v1.6.1)</a>
+    >aws-sdk-mock (v1.7.0)</a>
 </h1>
 <h4>Functions to mock the JavaScript aws-sdk </h4>
 <div class="apidocSectionDiv"><a
@@ -97,54 +97,11 @@
 
         </li>
 
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.aws-sdk-mock.Promise">module aws-sdk-mock.Promise</a><ol>
-
         <li>
 
-            <a class="apidocElementLiA" href="#apidoc.element.aws-sdk-mock.Promise.Promise">
-            function <span class="apidocSignatureSpan">aws-sdk-mock.</span>Promise
-            <span class="apidocSignatureSpan">()</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.aws-sdk-mock.mock">module aws-sdk-mock.mock</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.aws-sdk-mock.mock.mock">
-            function <span class="apidocSignatureSpan">aws-sdk-mock.</span>mock
-            <span class="apidocSignatureSpan">(service, method, replace)</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.aws-sdk-mock.restore">module aws-sdk-mock.restore</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.aws-sdk-mock.restore.restore">
-            function <span class="apidocSignatureSpan">aws-sdk-mock.</span>restore
-            <span class="apidocSignatureSpan">(service, method)</span>
-            </a>
-
-        </li>
-
-    </ol></li>
-
-    <li class="apidocModuleLi"><a href="#apidoc.module.aws-sdk-mock.setSDK">module aws-sdk-mock.setSDK</a><ol>
-
-        <li>
-
-            <a class="apidocElementLiA" href="#apidoc.element.aws-sdk-mock.setSDK.setSDK">
-            function <span class="apidocSignatureSpan">aws-sdk-mock.</span>setSDK
-            <span class="apidocSignatureSpan">(path)</span>
+            <a class="apidocElementLiA" href="#apidoc.element.aws-sdk-mock.setSDKInstance">
+            function <span class="apidocSignatureSpan">aws-sdk-mock.</span>setSDKInstance
+            <span class="apidocSignatureSpan">(sdk)</span>
             </a>
 
         </li>
@@ -166,22 +123,21 @@
     <ul>
     <li>description and source-code<pre class="apidocCodePre">function Promise() { [native code] }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-  userArgs = args.slice(0, -1);
-  userCallback = args[(args.length || 1) - 1];
-} else {
-  userArgs = args;
-}
-var havePromises = typeof(AWS.Promise) === &#x27;function&#x27;;
-var promise, resolve, reject;
-var makeResolved = function(value) {return new AWS.<span class="apidocCodeKeywordSpan">Promise</span>(function (res) { res(value
-); }); };
-var makeRejected = function(value) {return new AWS.Promise(function (res, rej) { rej(value); }); };
-var callback = function(err, data) {
-  if (havePromises) {
-    if (err) {
-      if (reject) {
-        reject(err);
-      } else {
+    userCallback(err, data);
+  }
+  tryResolveFromStored();
+};
+var request = {
+  promise: havePromises ? function() {
+    if (!promise) {
+      promise = new AWS.<span class="apidocCodeKeywordSpan">Promise</span>(function (resolve_, reject_) {
+        resolve = resolve_;
+        reject = reject_;
+      });
+    }
+    tryResolveFromStored();
+    return promise;
+  } : undefined,
 ...</pre></li>
     </ul>
 
@@ -260,23 +216,21 @@ TESTS
   };
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-
-AWS.mock(&#x27;SNS&#x27;, &#x27;publish&#x27;, &#x27;test-message&#x27;);
+/**
+ * Restores a single mocked service and its corresponding methods.
+ */
+function restoreService(service) {
+  if (services[service]) {
+    restoreAllMethods(service);
+    if( services[service].stub)
+      services[service].stub.<span class="apidocCodeKeywordSpan">restore</span>();
+    delete services[service];
+  } else {
+    console.log(&#x27;Service &#x27; + service + &#x27; was never instantiated yet you try to restore it.&#x27;);
+  }
+}
 
 /**
-    TESTS
-**/
-
-AWS.<span class="apidocCodeKeywordSpan">restore</span>(&#x27;SNS&#x27;, &#x27;publish&#x27;);
-AWS.restore(&#x27;DynamoDB&#x27;);
-// or AWS.restore(); this will restore all the methods and services
-```
-
-**NB: The AWS Service needs to be initialised inside the function being tested in order for the SDK method to be mocked** e.g for
- an AWS Lambda function example 1 will cause an error `region not defined in config`  whereas in example 2 the sdk will be successfully
- mocked.
-
-Example 1:
 ...</pre></li>
     </ul>
 
@@ -309,185 +263,38 @@ AWS.<span class="apidocCodeKeywordSpan">setSDK</span>(path.resolve(&#x27;../../f
 **/
 ```
 
-## Documentation
+### Setting the `aws-sdk` object explicitly
 ...</pre></li>
     </ul>
 
 
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.aws-sdk-mock.Promise" id="apidoc.module.aws-sdk-mock.Promise">module aws-sdk-mock.Promise</a></h1>
-
 
     <h2>
-        <a href="#apidoc.element.aws-sdk-mock.Promise.Promise" id="apidoc.element.aws-sdk-mock.Promise.Promise">
-        function <span class="apidocSignatureSpan">aws-sdk-mock.</span>Promise
-        <span class="apidocSignatureSpan">()</span>
+        <a href="#apidoc.element.aws-sdk-mock.setSDKInstance" id="apidoc.element.aws-sdk-mock.setSDKInstance">
+        function <span class="apidocSignatureSpan">aws-sdk-mock.</span>setSDKInstance
+        <span class="apidocSignatureSpan">(sdk)</span>
         </a>
     </h2>
     <ul>
-    <li>description and source-code<pre class="apidocCodePre">function Promise() { [native code] }</pre></li>
-    <li>example usage<pre class="apidocCodePre">...
-  userArgs = args.slice(0, -1);
-  userCallback = args[(args.length || 1) - 1];
-} else {
-  userArgs = args;
-}
-var havePromises = typeof(AWS.Promise) === &#x27;function&#x27;;
-var promise, resolve, reject;
-var makeResolved = function(value) {return new AWS.<span class="apidocCodeKeywordSpan">Promise</span>(function (res) { res(value
-); }); };
-var makeRejected = function(value) {return new AWS.Promise(function (res, rej) { rej(value); }); };
-var callback = function(err, data) {
-  if (havePromises) {
-    if (err) {
-      if (reject) {
-        reject(err);
-      } else {
-...</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.aws-sdk-mock.mock" id="apidoc.module.aws-sdk-mock.mock">module aws-sdk-mock.mock</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.aws-sdk-mock.mock.mock" id="apidoc.element.aws-sdk-mock.mock.mock">
-        function <span class="apidocSignatureSpan">aws-sdk-mock.</span>mock
-        <span class="apidocSignatureSpan">(service, method, replace)</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">mock = function (service, method, replace) {
-  // If the service does not exist yet, we need to create and stub it.
-  if (!services[service]) {
-    services[service]             = {};
-
-<span class="apidocCodeCommentSpan">    /**
-     * Save the real constructor so we can invoke it later on.
-     * Uses traverse for easy access to nested services (dot-separated)
-     */
-</span>    services[service].Constructor = traverse(_AWS).get(service.split(&#x27;.&#x27;));
-    services[service].methodMocks = {};
-    services[service].invoked = false;
-    mockService(service);
-  }
-
-  // Register the method to be mocked out.
-  if(!services[service].methodMocks[method]) {
-    services[service].methodMocks[method] = { replace: replace };
-
-    // If the constructor was already invoked, we need to mock the method here.
-    if(services[service].invoked) {
-      mockServiceMethod(service, services[service].client, method, replace);
-    }
-  }
-  return services[service].methodMocks[method];
+    <li>description and source-code<pre class="apidocCodePre">setSDKInstance = function (sdk) {
+  _AWS = sdk;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-
-### Use in your Tests
-
-```js
-
-var AWS = require(&#x27;aws-sdk-mock&#x27;);
-
-AWS.<span class="apidocCodeKeywordSpan">mock</span>(&#x27;DynamoDB&#x27;, &#x27;putItem&#x27;, function (params, callback){
-  callback(null, &#x22;successfully put item in database&#x22;);
-});
-
-AWS.mock(&#x27;SNS&#x27;, &#x27;publish&#x27;, &#x27;test-message&#x27;);
-
-/**
-TESTS
-...</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.aws-sdk-mock.restore" id="apidoc.module.aws-sdk-mock.restore">module aws-sdk-mock.restore</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.aws-sdk-mock.restore.restore" id="apidoc.element.aws-sdk-mock.restore.restore">
-        function <span class="apidocSignatureSpan">aws-sdk-mock.</span>restore
-        <span class="apidocSignatureSpan">(service, method)</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">restore = function (service, method) {
-  if(!service) {
-    restoreAllServices();
-  } else {
-    if (method) {
-      restoreMethod(service, method);
-    } else {
-      restoreService(service);
-    }
-  };
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">...
-
-AWS.mock(&#x27;SNS&#x27;, &#x27;publish&#x27;, &#x27;test-message&#x27;);
-
-/**
-    TESTS
-**/
-
-AWS.<span class="apidocCodeKeywordSpan">restore</span>(&#x27;SNS&#x27;, &#x27;publish&#x27;);
-AWS.restore(&#x27;DynamoDB&#x27;);
-// or AWS.restore(); this will restore all the methods and services
-```
-
-**NB: The AWS Service needs to be initialised inside the function being tested in order for the SDK method to be mocked** e.g for
- an AWS Lambda function example 1 will cause an error `region not defined in config`  whereas in example 2 the sdk will be successfully
- mocked.
-
-Example 1:
-...</pre></li>
-    </ul>
-
-
-</div>
-
-<div class="apidocSectionDiv">
-<h1><a href="#apidoc.module.aws-sdk-mock.setSDK" id="apidoc.module.aws-sdk-mock.setSDK">module aws-sdk-mock.setSDK</a></h1>
-
-
-    <h2>
-        <a href="#apidoc.element.aws-sdk-mock.setSDK.setSDK" id="apidoc.element.aws-sdk-mock.setSDK.setSDK">
-        function <span class="apidocSignatureSpan">aws-sdk-mock.</span>setSDK
-        <span class="apidocSignatureSpan">(path)</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">setSDK = function (path) {
-  _AWS = require(path);
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">...
-Project structures that don&#x27;t include the `aws-sdk` at the top level `node_modules` project folder will not be properly mocked
-.  An example of this would be installing the `aws-sdk` in a nested project directory. You can get around this by explicitly setting
- the path to a nested `aws-sdk` module using `setSDK()`.
 
 Example:
 ```js
 var path = require(&#x27;path&#x27;);
 var AWS = require(&#x27;aws-sdk-mock&#x27;);
+var AWS_SDK = require(&#x27;aws-sdk&#x27;)
 
-AWS.<span class="apidocCodeKeywordSpan">setSDK</span>(path.resolve(&#x27;../../functions/foo/node_modules/aws-sdk&#x27;));
-
-/**
-    TESTS
-**/
+AWS.<span class="apidocCodeKeywordSpan">setSDKInstance</span>(AWS_SDK);
 ```
 
-## Documentation
+
+### Configuring promises
+
+If your environment lacks a global Promise contstructor (e.g. nodejs 0.10), you can explicitly set the promises on `aws-sdk-mock
+`. Set the value of `AWS.Promise` to the constructor for your chosen promise library.
 ...</pre></li>
     </ul>
 
